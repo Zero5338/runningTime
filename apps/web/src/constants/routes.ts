@@ -1,0 +1,16 @@
+export const ROUTES = {
+  home: '/',
+  raceDetail: (raceId: string) => `/races/${raceId}`,
+  community: '/community',
+  postDetail: (postId: string) => `/community/${postId}`,
+  postWrite: '/community/write',
+  postEdit: (postId: string) => `/community/${postId}/edit`,
+  login: '/login',
+  mypage: '/mypage',
+  myFavorites: '/mypage/favorites',
+  myPosts: '/mypage/posts',
+  account: '/mypage/account',
+  notifications: '/mypage/notifications',
+  withdraw: '/mypage/withdraw',
+  withdrawComplete: '/mypage/withdraw/complete',
+} as const;

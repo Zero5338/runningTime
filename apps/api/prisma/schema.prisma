@@ -1,0 +1,11 @@
+// DB 스키마는 개발 설계서 작성 후 추가한다.
+// 대회는 시리즈(매년 반복)와 회차(연도별)로 분리하고, 지역은 시/도·시/군/구로 저장한다.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}

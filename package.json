@@ -1,0 +1,31 @@
+{
+  "name": "runnershigh",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n web,api -c blue,green \"npm run dev -w @runnershigh/web\" \"npm run dev -w @runnershigh/api\"",
+    "dev:web": "npm run dev -w @runnershigh/web",
+    "dev:api": "npm run dev -w @runnershigh/api",
+    "build": "npm run build -w @runnershigh/api && npm run build -w @runnershigh/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "concurrently": "10.0.6",
+    "husky": "9.1.7",
+    "lint-staged": "16.4.0",
+    "prettier": "3.9.10",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "typescript": "5.9.3"
+  }
+}

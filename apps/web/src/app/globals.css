@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+/*
+ * 디자인 토큰 (인수인계서 '디자인 규칙')
+ * - 흰 배경, 검정 텍스트·검정 주요 버튼의 미니멀 톤
+ * - 포인트 컬러 #FF6F0F: 로고 점, 관심 하트, 글쓰기 버튼, 상태 강조에만
+ * - 작은 주황 글자는 #B84400 (brand-strong)
+ * - 반응형: 767px 이하 모바일, md(768) 상단 메뉴·카드 2열, lg(1024) 사이드바 필터·카드 3열
+ */
+@theme inline {
+  --font-sans: var(--font-plex-kr), system-ui, sans-serif;
+  --font-display: var(--font-archivo), var(--font-plex-kr), system-ui, sans-serif;
+}
+
+@theme {
+  --color-brand: #ff6f0f;
+  --color-brand-strong: #b84400;
+  --container-content: 1200px;
+}
+
+@layer base {
+  body {
+    @apply bg-white font-sans text-black antialiased;
+  }
+}

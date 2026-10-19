@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# build outputs
+.next/
+out/
+build/
+dist/
+coverage/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# prisma 생성 클라이언트
+apps/api/src/generated/
+
+# env (예시 파일만 커밋)
+.env*
+!.env.example
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+.vercel
