@@ -13,7 +13,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white">
       <div className="mx-auto flex h-14 max-w-content items-center justify-between px-4 md:px-6">
         <Link href={ROUTES.home} className="font-display text-lg font-bold">
-          runnershigh<span className="text-brand">.</span>
+          runningtime<span className="text-brand">.</span>
         </Link>
         {/* md 이상에서만 상단 메뉴 노출, 모바일은 MobileTabBar */}
         <nav className="hidden gap-6 md:flex">

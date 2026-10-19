@@ -1,4 +1,4 @@
-import type { HealthResponse } from '@runnershigh/shared';
+import type { HealthResponse } from '@runningtime/shared';
 import { Router } from 'express';
 
 export const healthRouter = Router();

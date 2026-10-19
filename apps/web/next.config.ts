@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     root: path.join(import.meta.dirname, '../..'),
   },
   // packages/shared는 TS 소스를 그대로 내보내므로 Next가 함께 트랜스파일한다.
-  transpilePackages: ['@runnershigh/shared'],
+  transpilePackages: ['@runningtime/shared'],
 };
 
 export default nextConfig;

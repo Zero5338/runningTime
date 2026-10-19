@@ -1,5 +1,5 @@
 {
-  "name": "runnershigh",
+  "name": "runningtime",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -10,10 +10,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n web,api -c blue,green \"npm run dev -w @runnershigh/web\" \"npm run dev -w @runnershigh/api\"",
-    "dev:web": "npm run dev -w @runnershigh/web",
-    "dev:api": "npm run dev -w @runnershigh/api",
-    "build": "npm run build -w @runnershigh/api && npm run build -w @runnershigh/web",
+    "dev": "concurrently -n web,api -c blue,green \"npm run dev -w @runningtime/web\" \"npm run dev -w @runningtime/api\"",
+    "dev:web": "npm run dev -w @runningtime/web",
+    "dev:api": "npm run dev -w @runningtime/api",
+    "build": "npm run build -w @runningtime/api && npm run build -w @runningtime/web",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write .",

@@ -1,5 +1,5 @@
 {
-  "name": "@runnershigh/web",
+  "name": "@runningtime/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "5.9.2",
-    "@runnershigh/shared": "*",
+    "@runningtime/shared": "*",
     "@tanstack/react-query": "5.104.4",
     "next": "16.2.12",
     "react": "19.2.9",

@@ -1,16 +1,16 @@
-# runnersHigh
+# runningTime
 
-러너스하이: 수도권 마라톤 대회를 모아 찾고, 접수 오픈을 웹 푸시로 알려주는 웹앱 + 러너 커뮤니티
+러닝타임: 수도권 마라톤 대회를 모아 찾고, 접수 오픈을 웹 푸시로 알려주는 웹앱 + 러너 커뮤니티
 
 ## 구조 (npm workspaces 모노레포)
 
 ```
-runnershigh/
+runningtime/
 ├─ apps/
-│  ├─ web/        @runnershigh/web     Next.js 16.2 App Router, Tailwind 4, TanStack Query, React Hook Form
-│  └─ api/        @runnershigh/api     Express 5, Prisma 7 (PostgreSQL), zod
+│  ├─ web/        @runningtime/web     Next.js 16.2 App Router, Tailwind 4, TanStack Query, React Hook Form
+│  └─ api/        @runningtime/api     Express 5, Prisma 7 (PostgreSQL), zod
 ├─ packages/
-│  └─ shared/     @runnershigh/shared  웹·API 공통 zod 스키마와 타입
+│  └─ shared/     @runningtime/shared  웹·API 공통 zod 스키마와 타입
 ├─ docker-compose.yml                 로컬 PostgreSQL
 └─ tsconfig.base.json                 공통 TS 설정
 ```
@@ -22,8 +22,8 @@ runnershigh/
 - 패키지는 항상 대상 워크스페이스를 지정해 설치한다.
 
 ```bash
-npm install <패키지> -w @runnershigh/web
-npm install -D <패키지> -w @runnershigh/api
+npm install <패키지> -w @runningtime/web
+npm install -D <패키지> -w @runningtime/api
 ```
 
 ## 시작
@@ -45,8 +45,8 @@ npm run dev                          # web :3000 + api :4000 동시 실행
 | `npm run build`                          | api → web 순서로 빌드                    |
 | `npm run lint` / `npm run typecheck`     | 전체 워크스페이스 검사                   |
 | `npm run format`                         | Prettier 전체 포맷                       |
-| `npm run db:migrate -w @runnershigh/api` | Prisma 마이그레이션                      |
-| `npm run db:studio -w @runnershigh/api`  | Prisma Studio                            |
+| `npm run db:migrate -w @runningtime/api` | Prisma 마이그레이션                      |
+| `npm run db:studio -w @runningtime/api`  | Prisma Studio                            |
 
 ## 코드 품질
 
