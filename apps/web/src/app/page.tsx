@@ -1,6 +1,7 @@
 import RaceFilterBar from '@/components/race-list/RaceFilterBar';
 import RaceFilterSidebar from '@/components/race-list/RaceFilterSidebar';
 import RaceList from '@/components/race-list/RaceList';
+import RaceReportFab from '@/components/race-list/RaceReportFab';
 
 // 대회 목록 (메인). 필터 상태는 URL 쿼리 파라미터로 관리한다.
 export default function HomePage() {
@@ -15,6 +16,7 @@ export default function HomePage() {
         </div>
         <RaceList />
       </section>
+      <RaceReportFab />
     </div>
   );
 }

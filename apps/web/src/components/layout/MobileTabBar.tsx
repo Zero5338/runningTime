@@ -4,7 +4,7 @@ import { ROUTES } from '@/constants/routes';
 
 const TAB_ITEMS = [
   { href: ROUTES.home, label: '대회' },
-  { href: ROUTES.community, label: '커뮤니티' },
+  { href: ROUTES.stories, label: '대회 이야기' },
   { href: ROUTES.mypage, label: '마이' },
 ];
 

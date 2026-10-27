@@ -26,7 +26,8 @@ export const metadata: Metadata = {
     default: '러닝타임',
     template: '%s | 러닝타임',
   },
-  description: '수도권 마라톤 대회를 한곳에서 찾고, 접수 오픈 알림을 받아보세요.',
+  description:
+    '서울·경기·인천·강원·대전·충남 마라톤 대회를 한곳에서 찾고, 접수 오픈 알림을 받아보세요.',
 };
 
 export const viewport: Viewport = {

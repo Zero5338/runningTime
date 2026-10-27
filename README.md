@@ -1,6 +1,9 @@
 # runningTime
 
-러닝타임: 수도권 마라톤 대회를 모아 찾고, 접수 오픈을 웹 푸시로 알려주는 웹앱 + 러너 커뮤니티
+러닝타임: 서울·경기·인천·강원·대전·충남 마라톤 대회를 모아 찾고, 접수 오픈을 웹 푸시로 알려주는 웹앱.
+대회마다 '대회 의견'(자유·질문·후기)을 남기고, 전체 글은 '대회 이야기' 피드로 모아 본다.
+
+기획·결정 사항은 [docs/인수인계서.md](docs/인수인계서.md)를 기준으로 한다.
 
 ## 구조 (npm workspaces 모노레포)
 
@@ -11,9 +14,25 @@ runningtime/
 │  └─ api/        @runningtime/api     Express 5, Prisma 7 (PostgreSQL), zod
 ├─ packages/
 │  └─ shared/     @runningtime/shared  웹·API 공통 zod 스키마와 타입
+├─ docs/                              인수인계서 등 기획 문서
 ├─ docker-compose.yml                 로컬 PostgreSQL
 └─ tsconfig.base.json                 공통 TS 설정
 ```
+
+## 웹 라우트 (apps/web)
+
+| 경로                                     | 화면                                                       |
+| ---------------------------------------- | ---------------------------------------------------------- |
+| `/`                                      | 대회 목록 (+ 대회 제보 플로팅 버튼)                        |
+| `/races/:raceId`                         | 대회 상세: 요약 카드, 대회정보·대회 의견 (`?tab=opinions`) |
+| `/races/:raceId/posts/write`             | 글쓰기 (대회 고정)                                         |
+| `/races/:raceId/posts/:postId` (`/edit`) | 대회 의견 글 상세·수정                                     |
+| `/stories`                               | 대회 이야기 피드 (검색·종류 필터)                          |
+| `/report`                                | 대회 제보 (신규·정보 오류)                                 |
+| `/login`                                 | 카카오·네이버·구글 로그인                                  |
+| `/mypage/*`                              | 관심 대회, 내가 쓴 글, 계정 설정, 알림 설정, 회원탈퇴      |
+
+페이지 UI는 `src/components/<페이지명>/`에, 여러 페이지가 쓰는 ⋯ 메뉴·신고 대화상자는 `src/components/common/`에 둔다.
 
 ## 환경
 

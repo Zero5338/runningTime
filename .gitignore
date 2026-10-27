@@ -24,3 +24,6 @@ apps/api/src/generated/
 *.pem
 npm-debug.log*
 .vercel
+
+# docs
+docs/인수인계서.md
