@@ -3,8 +3,6 @@
 러닝타임: 서울·경기·인천·강원·대전·충남 마라톤 대회를 모아 찾고, 접수 오픈을 웹 푸시로 알려주는 웹앱.
 대회마다 '대회 의견'(자유·질문·후기)을 남기고, 전체 글은 '대회 이야기' 피드로 모아 본다.
 
-기획·결정 사항은 [docs/인수인계서.md](docs/인수인계서.md)를 기준으로 한다.
-
 ## 구조 (npm workspaces 모노레포)
 
 ```
@@ -14,7 +12,6 @@ runningtime/
 │  └─ api/        @runningtime/api     Express 5, Prisma 7 (PostgreSQL), zod
 ├─ packages/
 │  └─ shared/     @runningtime/shared  웹·API 공통 zod 스키마와 타입
-├─ docs/                              인수인계서 등 기획 문서
 ├─ docker-compose.yml                 로컬 PostgreSQL
 └─ tsconfig.base.json                 공통 TS 설정
 ```
