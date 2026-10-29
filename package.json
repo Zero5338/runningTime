@@ -21,7 +21,8 @@
     "prepare": "husky",
     "db:generate": "npm run db:generate -w @runningtime/api",
     "db:migrate": "npm run db:migrate -w @runningtime/api",
-    "db:studio": "npm run db:studio -w @runningtime/api"
+    "db:studio": "npm run db:studio -w @runningtime/api",
+    "db:seed": "npm run db:seed -w @runningtime/api"
   },
   "devDependencies": {
     "concurrently": "10.0.6",
