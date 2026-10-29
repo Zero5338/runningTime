@@ -1,5 +1,6 @@
-// DB 스키마는 개발 설계서 작성 후 추가한다.
-// 대회는 시리즈(매년 반복)와 회차(연도별)로 분리하고, 지역은 시/도·시/군/구로 저장한다.
+// 러닝타임(runningtime) DB 스키마 초안 v0.1 (2026-10-27)
+// 위치: apps/api/prisma/schema.prisma
+// 기준: MVP 기능 정의서 + 프로토타입(대회 의견·대회 이야기·신고·제보·로그인 3종)
 
 generator client {
   provider = "prisma-client"
@@ -8,4 +9,372 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AuthProvider {
+  KAKAO
+  NAVER
+  GOOGLE
+}
+
+/// 운영 상태. 접수 상태(접수 예정/접수중/마감)는 날짜로 계산하고 저장하지 않는다.
+enum EventStatus {
+  SCHEDULED // 예정(정상)
+  CANCELED // 취소
+  CLOSED_EARLY // 조기 마감
+  POSTPONED // 연기
+}
+
+/// 대회 정보 출처
+enum EventSource {
+  ADMIN
+  PUBLIC_DATA
+  USER_REPORT
+  ORGANIZER
+}
+
+enum PostKind {
+  FREE // 자유
+  QUESTION // 질문 (태그만, 해결/채택 없음)
+  REVIEW // 후기 (대회 종료 후, 종목 필수)
+}
+
+enum ReportTargetType {
+  POST
+  COMMENT
+}
+
+enum ReportReason {
+  SPAM_AD // 스팸·광고
+  ABUSE // 욕설·비방
+  PRIVACY // 개인정보 노출
+  FALSE_INFO // 허위 정보
+  ETC // 기타
+}
+
+enum ReviewStatus {
+  PENDING // 대기
+  ACCEPTED // 처리/승인
+  REJECTED // 반려
+}
+
+enum RaceReportType {
+  NEW_RACE // 신규 대회 제보
+  CORRECTION // 정보 오류 제보
+}
+
+enum ReporterRole {
+  PARTICIPANT // 참가자·일반 러너
+  ORGANIZER // 주최·주관 측
+}
+
+enum NotificationType {
+  REG_OPEN_D1 // 접수 오픈 하루 전
+  REG_OPEN_DAY // 접수 오픈 당일
+}
+
+// ─────────────────────────────────────────────
+// 지역
+// ─────────────────────────────────────────────
+
+/// 서비스 지역. 초기 6곳(서울·경기·인천·강원·대전·충남), isVisible로 추가·숨김
+model Region {
+  code      String  @id // 예: "seoul", "gyeonggi"
+  name      String // 예: "서울"
+  sortOrder Int     @default(0)
+  isVisible Boolean @default(true)
+
+  events RaceEvent[]
+}
+
+// ─────────────────────────────────────────────
+// 대회
+// ─────────────────────────────────────────────
+
+/// 매년 반복되는 대회 단위(시리즈)
+model RaceSeries {
+  id          String   @id @default(cuid())
+  name        String // 예: "잠실 윈터 마라톤"
+  organizer   String? // 주최·주관
+  officialUrl String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  events RaceEvent[]
+}
+
+/// 연도별 회차. 대회 상세 페이지 하나 = RaceEvent 하나
+model RaceEvent {
+  id                String      @id @default(cuid())
+  seriesId          String
+  year              Int
+  slug              String      @unique // URL용, 예: "jamsil-winter-2026"
+  raceDate          DateTime    @db.Date
+  regionCode        String
+  venue             String // 장소(출발지)
+  registrationStart DateTime? // 접수 시작(시각까지)
+  registrationEnd   DateTime?
+  officialUrl       String? // 회차별 신청 페이지(없으면 시리즈 URL)
+  status            EventStatus @default(SCHEDULED)
+  source            EventSource @default(ADMIN)
+  isPublic          Boolean     @default(false) // 검수 후 공개
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  series        RaceSeries        @relation(fields: [seriesId], references: [id])
+  region        Region            @relation(fields: [regionCode], references: [code])
+  courses       RaceCourse[]
+  posts         Post[]
+  interests     Interest[]
+  reports       RaceReport[]
+  notifications NotificationLog[]
+
+  @@unique([seriesId, year])
+  @@index([isPublic, raceDate])
+  @@index([regionCode, raceDate])
+  @@index([registrationStart])
+}
+
+/// 종목(거리)별 정보
+model RaceCourse {
+  id        String  @id @default(cuid())
+  eventId   String
+  distance  String // "FULL" | "HALF" | "10K" | "5K" | 기타 표기
+  distanceM Int? // 정렬·필터용 미터 값(42195, 21097, 10000 …)
+  fee       Int? // 참가비(원)
+  startTime String? // "08:00"
+  timeLimit Int? // 제한 시간(분)
+  sortOrder Int     @default(0)
+
+  event   RaceEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  reviews Post[]
+
+  @@index([eventId])
+}
+
+// ─────────────────────────────────────────────
+// 회원·인증
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  nickname  String   @unique
+  email     String?
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  socialAccounts      SocialAccount[]
+  pushSubscriptions   PushSubscription[]
+  notificationSetting NotificationSetting?
+  interests           Interest[]
+  posts               Post[]
+  comments            Comment[]
+  postLikes           PostLike[]
+  reports             Report[]             @relation("Reporter")
+  raceReports         RaceReport[]         @relation("RaceReporter")
+  notificationLogs    NotificationLog[]
+}
+
+/// 계정별 소셜 로그인 연결. 하나의 User에 여러 제공자 연결 가능
+model SocialAccount {
+  id             String       @id @default(cuid())
+  userId         String
+  provider       AuthProvider
+  providerUserId String
+  createdAt      DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+}
+
+/// 탈퇴 후 3일 재가입 제한용. 식별값은 해시만 저장, 3일 뒤 배치로 삭제
+model WithdrawnAccount {
+  id                 String       @id @default(cuid())
+  provider           AuthProvider
+  providerUserIdHash String
+  withdrawnAt        DateTime     @default(now())
+  expiresAt          DateTime // withdrawnAt + 3일
+
+  @@unique([provider, providerUserIdHash])
+  @@index([expiresAt])
+}
+
+// ─────────────────────────────────────────────
+// 관심·알림
+// ─────────────────────────────────────────────
+
+/// 관심 체크 = 알림 신청
+model Interest {
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event RaceEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([userId, eventId])
+  @@index([eventId])
+}
+
+/// 기기·브라우저별 웹 푸시 구독
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model NotificationSetting {
+  userId          String  @id
+  notifyDayBefore Boolean @default(true)
+  notifySameDay   Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// 중복 발송 방지
+model NotificationLog {
+  id      String           @id @default(cuid())
+  userId  String
+  eventId String
+  type    NotificationType
+  sentAt  DateTime         @default(now())
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event RaceEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId, type])
+}
+
+// ─────────────────────────────────────────────
+// 대회 의견(커뮤니티)
+// ─────────────────────────────────────────────
+
+/// 대회 의견 글. 항상 하나의 대회(RaceEvent)에 속함
+model Post {
+  id           String    @id @default(cuid())
+  eventId      String
+  userId       String? // 탈퇴 시 null → '탈퇴한 회원'
+  kind         PostKind
+  courseId     String? // 후기일 때만(종목 필수), 앱 레벨에서 검증
+  title        String
+  body         String
+  likeCount    Int       @default(0)
+  commentCount Int       @default(0)
+  reportCount  Int       @default(0)
+  isHidden     Boolean   @default(false) // 신고 3회 이상 자동 숨김 또는 운영자 숨김
+  deletedAt    DateTime? // 작성자 삭제(소프트 삭제)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  event    RaceEvent   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user     User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  course   RaceCourse? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  images   PostImage[]
+  comments Comment[]
+  likes    PostLike[]
+
+  @@index([eventId, createdAt])
+  @@index([kind, createdAt])
+  @@index([userId])
+}
+
+/// 최대 5장(앱 레벨 검증). 파일은 S3 호환 저장소, DB엔 키만
+model PostImage {
+  id        String @id @default(cuid())
+  postId    String
+  key       String // 저장소 객체 키
+  sortOrder Int    @default(0)
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+}
+
+model Comment {
+  id          String    @id @default(cuid())
+  postId      String
+  userId      String?
+  body        String
+  reportCount Int       @default(0)
+  isHidden    Boolean   @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  post Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([postId, createdAt])
+  @@index([userId])
+}
+
+/// 공감(중복 불가)
+model PostLike {
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([postId, userId])
+  @@index([userId])
+}
+
+/// 글·댓글 신고. targetType + targetId 다형 참조(외래키 없음)
+model Report {
+  id         String           @id @default(cuid())
+  targetType ReportTargetType
+  targetId   String
+  reporterId String?
+  reason     ReportReason
+  detail     String? // 기타 사유
+  status     ReviewStatus     @default(PENDING)
+  createdAt  DateTime         @default(now())
+  handledAt  DateTime?
+
+  reporter User? @relation("Reporter", fields: [reporterId], references: [id], onDelete: SetNull)
+
+  @@unique([targetType, targetId, reporterId])
+  @@index([status, createdAt])
+}
+
+// ─────────────────────────────────────────────
+// 대회 제보
+// ─────────────────────────────────────────────
+
+/// 신규 대회·정보 오류 제보. 검수 후 RaceEvent에 반영
+model RaceReport {
+  id           String         @id @default(cuid())
+  type         RaceReportType
+  eventId      String? // 오류 제보일 때 대상 대회
+  reporterId   String?
+  reporterRole ReporterRole   @default(PARTICIPANT)
+  contactEmail String? // 주최 측이면 연락처
+  payload      Json // 대회명, 일자, 지역, 장소, 종목, 접수일, 링크, 메모 등
+  status       ReviewStatus   @default(PENDING)
+  rejectReason String?
+  createdAt    DateTime       @default(now())
+  handledAt    DateTime?
+
+  event    RaceEvent? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  reporter User?      @relation("RaceReporter", fields: [reporterId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
 }

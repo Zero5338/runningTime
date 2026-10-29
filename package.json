@@ -18,7 +18,10 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:generate": "npm run db:generate -w @runningtime/api",
+    "db:migrate": "npm run db:migrate -w @runningtime/api",
+    "db:studio": "npm run db:studio -w @runningtime/api"
   },
   "devDependencies": {
     "concurrently": "10.0.6",
