@@ -6,5 +6,5 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["src", "prisma.config.ts", "tsup.config.ts"]
+  "include": ["src", "prisma.config.ts", "tsup.config.ts", "seed"]
 }

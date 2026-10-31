@@ -1,5 +1,5 @@
 // 러닝타임 개발용 시드 데이터 초안 v0.1 (2026-10-29)
-// 위치(예정): apps/api/prisma/seed.ts
+// 위치(예정): aapps/api/seed/seed.ts
 // 실행(예정): npm run db:seed -w apps/api  →  prisma db seed
 //
 // - 로컬 개발 DB 전용. 실행할 때마다 기존 데이터를 지우고 다시 넣는다.
